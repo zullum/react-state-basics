@@ -1,6 +1,5 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import styled from '@emotion/styled';
-import PokemonContext from '../PokemonContext';
 
 const Input = styled.input`
   width: 100%;
@@ -8,8 +7,7 @@ const Input = styled.input`
   font-size: large;
 `;
 
-const PokemonFilter = () => {
-  const { filter, filterSet } = useContext(PokemonContext);
+const PokemonFilter = ({ filter, filterSet }) => {
   return (
     <Input
       type="text"
