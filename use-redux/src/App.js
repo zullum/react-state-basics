@@ -6,29 +6,8 @@ import './App.css';
 import PokemonInfo from './components/PokemonInfo';
 import PokemonFilter from './components/PokemonFilter';
 import PokemonTable from './components/PokemonTable';
-import PokemonContext from './PokemonContext';
-
-const pokemonReducer = (state, action) => {
-  switch (action.type) {
-    case 'SET_FILTER':
-      return {
-        ...state,
-        filter: action.payload,
-      };
-    case 'SET_SELECTED_POKEMON':
-      return {
-        ...state,
-        selectedPokemon: action.payload,
-      };
-    case 'SET_POKEMON':
-      return {
-        ...state,
-        pokemon: action.payload,
-      };
-    default:
-      throw new Error('Unexpected action');
-  }
-};
+import { Provider, useDispatch, useSelector } from 'react-redux';
+import store from './store';
 
 const Title = styled.h1`
   text-align: center;
@@ -45,11 +24,8 @@ const TwoColumnLayout = styled.div`
 `;
 
 function App() {
-  const [state, dispatch] = React.useReducer(pokemonReducer, {
-    filter: '',
-    pokemon: [],
-    selectedPokemon: null,
-  });
+  const dispatch = useDispatch();
+  const pokemon = useSelector((state) => state.pokemon);
 
   React.useEffect(() => {
     fetch('/starting-react/pokemon.json')
@@ -60,33 +36,30 @@ function App() {
           payload: data,
         })
       );
-  }, []);
+  }, [dispatch]);
 
-  if (!state.pokemon) {
+  if (!pokemon) {
     return <div>Loading data</div>;
   }
 
   return (
-    <PokemonContext.Provider
-      value={{
-        state,
-        dispatch,
-      }}
-    >
-      <PageContainer>
-        <CssBaseline />
-        <Title>Pokemon Search</Title>
-        <TwoColumnLayout>
-          <div>
-            <PokemonFilter />
+    <PageContainer>
+      <CssBaseline />
+      <Title>Pokemon Search</Title>
+      <TwoColumnLayout>
+        <div>
+          <PokemonFilter />
 
-            <PokemonTable />
-          </div>
-          <PokemonInfo />
-        </TwoColumnLayout>
-      </PageContainer>
-    </PokemonContext.Provider>
+          <PokemonTable />
+        </div>
+        <PokemonInfo />
+      </TwoColumnLayout>
+    </PageContainer>
   );
 }
 
-export default App;
+export default () => (
+  <Provider store={store}>
+    <App />
+  </Provider>
+);
